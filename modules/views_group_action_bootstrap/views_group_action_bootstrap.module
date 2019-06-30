@@ -1,0 +1,58 @@
+<?php
+
+/**
+ * @file
+ * Contains views_group_action_bootstrap.module.
+ */
+
+/**
+ * Implements hook_theme_registry_alter().
+ */
+function views_group_action_bootstrap_theme_registry_alter(&$theme_registry) {
+  $themes_with_group_action_form = [
+    'views_bootstrap_grid_group_action',
+    'views_bootstrap_list_group_group_action',
+    'views_bootstrap_table_group_action',
+  ];
+  foreach ($themes_with_group_action_form as $theme) {
+    if (!empty($theme_registry[$theme])) {
+      $theme_registry[$theme]['variables']['group_action_form'] = NULL;
+    }
+  }
+}
+
+/**
+ * Prepares variables for bootstrap views grid group action templates.
+ *
+ * Default template: views-bootstrap-grid-group-action.html.twig.
+ *
+ * @param array $variables
+ *   An associative array containing with template variables.
+ */
+function template_preprocess_views_bootstrap_grid_group_action(array &$variables, $hook) {
+  _views_group_action_template_preprocess_helper($variables, 'views_bootstrap_grid', $hook);
+}
+
+/**
+ * Prepares variables for bootstrap views list group group action templates.
+ *
+ * Default template: views-bootstrap-list-group-group-action.html.twig.
+ *
+ * @param array $variables
+ *   An associative array containing with template variables.
+ */
+function template_preprocess_views_bootstrap_list_group_group_action(array &$variables, $hook) {
+  _views_group_action_template_preprocess_helper($variables, 'views_bootstrap_list_group', $hook);
+}
+
+/**
+ * Prepares variables for bootstrap views table group action templates.
+ *
+ * Default template: views-bootstrap-table-group-action.html.twig.
+ *
+ * @param array $variables
+ *   An associative array containing with template variables.
+ */
+function template_preprocess_views_bootstrap_table_group_action(array &$variables, $hook) {
+  _views_group_action_template_preprocess_helper($variables, 'views_bootstrap_table', $hook);
+}

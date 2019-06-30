@@ -1,0 +1,163 @@
+<?php
+
+/**
+ * @file
+ * Contains views_group_action.module.
+ */
+
+use Drupal\Component\Render\FormattableMarkup;
+
+/**
+ * Implements hook_theme().
+ */
+function views_group_action_theme($existing, $type, $theme, $path) {
+  $hooks['views_group_action_grouping'] = [
+    'variables' => [
+      'view' => NULL,
+      'grouping' => NULL,
+      'grouping_level' => NULL,
+      'rows' => NULL,
+      'title' => NULL,
+      'group_action_form' => NULL,
+    ],
+  ];
+  return $hooks;
+}
+
+/**
+ * Implements hook_theme_registry_alter().
+ */
+function views_group_action_theme_registry_alter(&$theme_registry) {
+  $themes_with_group_action_form = [
+    'views_view_unformatted_group_action',
+    'views_view_grid_group_action',
+    'views_view_list_group_action',
+    'views_view_table_group_action',
+  ];
+  foreach ($themes_with_group_action_form as $theme) {
+    if (!empty($theme_registry[$theme])) {
+      $theme_registry[$theme]['variables']['group_action_form'] = NULL;
+    }
+  }
+}
+
+/**
+ * Helps to re-use "parent" hook functions and templates.
+ *
+ * @param array $variables
+ *   An associative array containing with template variables.
+ * @param string $altered_hook
+ *   The altered/parent theme hook which is used for the theme function.
+ * @param string $current_hook
+ *   Actual theme name.
+ */
+function _views_group_action_template_preprocess_helper(array &$variables, $altered_hook, $current_hook) {
+  // Finds path to the template which is really used.
+  // See ThemeManager::render() for more details.
+  /** @var \Drupal\Core\Utility\ThemeRegistry $theme_registry */
+  $theme_registry = \Drupal::service('theme.registry')->getRuntime();
+  $altered_hook_info = $theme_registry->get($altered_hook);
+  $current_hook_info = $theme_registry->get($current_hook);
+
+  // Finds the used twig file for the altered/parent theme for to include this
+  // template into the twig template for the current theme.
+  $template_file = $altered_hook_info['template'] . '.html.twig';
+  if (isset($info['path'])) {
+    $template_file = $altered_hook_info['path'] . '/' . $template_file;
+  }
+  $variables['include_template_file'] = $template_file;
+
+  // Include all needed files.
+  if (!empty($altered_hook_info['includes'])) {
+    foreach ($altered_hook_info['includes'] as $file_path) {
+      $file_path = DRUPAL_ROOT . '/' . $file_path;
+      require_once $file_path;
+    }
+  }
+
+  // Executes additional preprocess functions of the altered/parent theme.
+  // For example: if it is views_bootstrap_table theme then it requires to
+  // execute template_preprocess_views_view_table() before the original hook
+  // (template_preprocess_views_bootstrap_table) will be executed.
+  $execute_preprocesses = array_diff($altered_hook_info['preprocess functions'], $current_hook_info['preprocess functions']);
+  foreach ($execute_preprocesses as $execute_preprocess) {
+    call_user_func_array($execute_preprocess, [&$variables]);
+  }
+
+  // Allows html tags in title.
+  if (!empty($variables['title'])) {
+    $variables['title'] = new FormattableMarkup($variables['title'], []);
+  }
+}
+
+/**
+ * Prepares variables for views single grouping templates.
+ *
+ * Default template: views-view-grouping.html.twig.
+ *
+ * @param array $variables
+ *   An associative array containing:
+ *   - view: The view object.
+ *   - rows: The rows returned from the view.
+ *   - grouping_level: Integer indicating the hierarchical level of the
+ *     grouping.
+ *   - content: The content to be grouped.
+ *   - title: The group heading.
+ *   - group_action_form: The action form for the group.
+ */
+function template_preprocess_views_group_action_grouping(array &$variables) {
+  $variables['content'] = $variables['view']->style_plugin->renderGroupingSets($variables['rows'], $variables['grouping_level']);
+
+  // Allows html tags in title.
+  if (!empty($variables['title'])) {
+    $variables['title'] = new FormattableMarkup($variables['title'], []);
+  }
+}
+
+/**
+ * Prepares variables for views unformatted group action templates.
+ *
+ * Default template: views-view-unformatted-group-action.html.twig.
+ *
+ * @param array $variables
+ *   An associative array containing with template variables.
+ */
+function template_preprocess_views_view_unformatted_group_action(array &$variables, $hook) {
+  _views_group_action_template_preprocess_helper($variables, 'views_view_unformatted', $hook);
+}
+
+/**
+ * Prepares variables for views grid group action templates.
+ *
+ * Default template: views-view-grid-group-action.html.twig.
+ *
+ * @param array $variables
+ *   An associative array containing with template variables.
+ */
+function template_preprocess_views_view_grid_group_action(array &$variables, $hook) {
+  _views_group_action_template_preprocess_helper($variables, 'views_view_grid', $hook);
+}
+
+/**
+ * Prepares variables for views list group action templates.
+ *
+ * Default template: views-view-list-group-action.html.twig.
+ *
+ * @param array $variables
+ *   An associative array containing with template variables.
+ */
+function template_preprocess_views_view_list_group_action(array &$variables, $hook) {
+  _views_group_action_template_preprocess_helper($variables, 'views_view_list', $hook);
+}
+
+/**
+ * Prepares variables for views table group action templates.
+ *
+ * Default template: views-view-table-group-action.html.twig.
+ *
+ * @param array $variables
+ *   An associative array containing with template variables.
+ */
+function template_preprocess_views_view_table_group_action(array &$variables, $hook) {
+  _views_group_action_template_preprocess_helper($variables, 'views_view_table', $hook);
+}

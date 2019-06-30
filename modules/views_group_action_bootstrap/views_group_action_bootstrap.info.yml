@@ -1,0 +1,8 @@
+name: Views Group Action (Bootstrap)
+type: module
+description: 'Views Group Action sub-module: extends Views bootstrap style plugins.'
+core: 8.x
+package: Views
+dependencies:
+  - views_bootstrap
+  - views_group_action

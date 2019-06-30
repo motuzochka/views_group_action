@@ -1,0 +1,8 @@
+name: Views Group Action (FooTable)
+type: module
+description: 'Views Group Action sub-module: extends Views FooTable style plugin.'
+core: 8.x
+package: Views
+dependencies:
+  - footable
+  - views_group_action

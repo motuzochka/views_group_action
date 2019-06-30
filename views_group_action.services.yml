@@ -1,0 +1,4 @@
+services:
+  plugin.manager.views_group_action_plugin:
+    class: Drupal\views_group_action\ViewsGroupActionFormPluginManager
+    arguments: ['@container.namespaces', '@cache.discovery', '@module_handler']

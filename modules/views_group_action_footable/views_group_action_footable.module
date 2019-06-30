@@ -1,0 +1,32 @@
+<?php
+
+/**
+ * @file
+ * Contains views_group_action_footable.module.
+ */
+
+/**
+ * Implements hook_theme_registry_alter().
+ */
+function views_group_action_footable_theme_registry_alter(&$theme_registry) {
+  $themes_with_group_action_form = [
+    'views_view_footable_group_action',
+  ];
+  foreach ($themes_with_group_action_form as $theme) {
+    if (!empty($theme_registry[$theme])) {
+      $theme_registry[$theme]['variables']['group_action_form'] = NULL;
+    }
+  }
+}
+
+/**
+ * Prepares variables for views footable group action templates.
+ *
+ * Default template: views-view-footable-group-action.html.twig.
+ *
+ * @param array $variables
+ *   An associative array containing with template variables.
+ */
+function template_preprocess_views_view_footable_group_action(array &$variables, $hook) {
+  _views_group_action_template_preprocess_helper($variables, 'views_view_footable', $hook);
+}

@@ -1,0 +1,7 @@
+{
+  "name": "drupal/views_group_action",
+  "type": "drupal-module",
+  "description": "Provides an ability to perform an action to grouped results of a view.",
+  "keywords": ["Drupal"],
+  "license": "GPL-2.0+"
+}
